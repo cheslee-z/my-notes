@@ -1,418 +1,635 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 5.4.2">
 
-  
-  <title>SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记 | Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记  Abstract 作者提出了一种半直接单目视觉里程计算法，该算法精确、鲁棒，并且比当前最先进的方法更快 该算法无需代价昂贵的特征提取和鲁棒匹配技术 该算法直接对像素强度进行操作，在高帧率下可以达到亚像素精度 使用显式建模异常测量的概率建图方法来估计3D点，从而得到更少的异常点和更可靠的点">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zcl-notes/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zcl-notes/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zcl-notes/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zcl-notes/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zcl-notes/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"cheslee-z.github.io","root":"/zcl-notes/","images":"/zcl-notes/images","scheme":"Muse","darkmode":true,"version":"8.13.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/zcl-notes/js/config.js"></script>
+
+    <meta name="description" content="Abstract  作者提出了一种半直接单目视觉里程计算法，该算法精确、鲁棒，并且比当前最先进的方法更快  该算法无需代价昂贵的特征提取和鲁棒匹配技术 该算法直接对像素强度进行操作，在高帧率下可以达到亚像素精度 使用显式建模异常测量的概率建图方法来估计3D点，从而得到更少的异常点和更可靠的点 精确的高帧率运动估计在纹理较少、重复和高频的场景中具有更高的鲁棒性  该算法应用于G">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记">
 <meta property="og:url" content="http://cheslee-z.github.io/zcl-notes/2022/11/28/SVO-Fast-Semi-Direct-Monocular-Visual-Odometry%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记  Abstract 作者提出了一种半直接单目视觉里程计算法，该算法精确、鲁棒，并且比当前最先进的方法更快 该算法无需代价昂贵的特征提取和鲁棒匹配技术 该算法直接对像素强度进行操作，在高帧率下可以达到亚像素精度 使用显式建模异常测量的概率建图方法来估计3D点，从而得到更少的异常点和更可靠的点">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221116110324076.png">
-<meta property="og:image" content="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119112435187.png">
-<meta property="og:image" content="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119112019772.png">
-<meta property="og:image" content="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119113816645.png">
-<meta property="og:image" content="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221120163927499.png">
-<meta property="og:image" content="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221120175355256.png">
+<meta property="og:site_name" content="Chenlong Zhang&#39;s Blog">
+<meta property="og:description" content="Abstract  作者提出了一种半直接单目视觉里程计算法，该算法精确、鲁棒，并且比当前最先进的方法更快  该算法无需代价昂贵的特征提取和鲁棒匹配技术 该算法直接对像素强度进行操作，在高帧率下可以达到亚像素精度 使用显式建模异常测量的概率建图方法来估计3D点，从而得到更少的异常点和更可靠的点 精确的高帧率运动估计在纹理较少、重复和高频的场景中具有更高的鲁棒性  该算法应用于G">
+<meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-11-28T09:24:53.000Z">
-<meta property="article:modified_time" content="2022-11-28T09:25:50.247Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:modified_time" content="2022-11-28T10:29:40.566Z">
+<meta property="article:author" content="Chenlong Zhang">
+<meta property="article:tag" content="SLAM">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221116110324076.png">
-  
-    <link rel="alternate" href="/zcl-notes/atom.xml" title="Hexo" type="application/atom+xml">
-  
-  
-    <link rel="icon" href="/favicon.png">
-  
-  
-    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
-  
-  
-<link rel="stylesheet" href="/zcl-notes/css/style.css">
 
-<meta name="generator" content="Hexo 5.4.2"></head>
 
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/zcl-notes/" id="logo">Hexo</a>
-      </h1>
-      
+<link rel="canonical" href="http://cheslee-z.github.io/zcl-notes/2022/11/28/SVO-Fast-Semi-Direct-Monocular-Visual-Odometry%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://cheslee-z.github.io/zcl-notes/2022/11/28/SVO-Fast-Semi-Direct-Monocular-Visual-Odometry%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/","path":"2022/11/28/SVO-Fast-Semi-Direct-Monocular-Visual-Odometry论文阅读笔记/","title":"SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记 | Chenlong Zhang's Blog</title>
+  
+
+
+
+
+
+
+  <script async defer data-website-id="" src=""></script>
+
+  <script defer data-domain="" src=""></script>
+
+  <noscript>
+    <link rel="stylesheet" href="/zcl-notes/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
     </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zcl-notes/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Chenlong Zhang's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">welcome!</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
         
-          <a class="main-nav-link" href="/zcl-notes/">Home</a>
-        
-          <a class="main-nav-link" href="/zcl-notes/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/zcl-notes/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://cheslee-z.github.io/zcl-notes"></form>
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#abstract"><span class="nav-number">1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">2.</span> <span class="nav-text">1 Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#taxonomy-of-visual-motion-estimation-methods"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 Taxonomy of
+Visual Motion Estimation Methods</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#related-work"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 Related Work</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#contributions-and-outline"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 Contributions and Outline</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#system-overview"><span class="nav-number">3.</span> <span class="nav-text">2 System Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#notation"><span class="nav-number">4.</span> <span class="nav-text">3 Notation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#motion-estimation"><span class="nav-number">5.</span> <span class="nav-text">4 Motion Estimation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sparse-model-based-image-alignment"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 Sparse Model-based Image
+Alignment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#relaxation-through-feature-alignment"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 Relaxation Through
+Feature Alignment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pose-and-structure-refinement"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 Pose and Structure
+Refinement</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#discussion"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 Discussion</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mapping"><span class="nav-number">6.</span> <span class="nav-text">5 Mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#implementation-details"><span class="nav-number">7.</span> <span class="nav-text">6 Implementation Details</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#experimental-results"><span class="nav-number">8.</span> <span class="nav-text">7 Experimental Results</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#accuracy"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 Accuracy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#runtime-evaluation"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 Runtime Evaluation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#robustness"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 Robustness</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conclusion"><span class="nav-number">9.</span> <span class="nav-text">8 Conclusion</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">10.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chenlong Zhang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/zcl-notes/archives/">
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
       </div>
     </div>
-  </div>
-</header>
-      <div class="outer">
-        <section id="main"><article id="post-SVO-Fast-Semi-Direct-Monocular-Visual-Odometry论文阅读笔记" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/zcl-notes/2022/11/28/SVO-Fast-Semi-Direct-Monocular-Visual-Odometry%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" class="article-date">
-  <time datetime="2022-11-28T09:24:53.000Z" itemprop="datePublished">2022-11-28</time>
-</a>
+
     
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 class="article-title" itemprop="name">
-      SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记
-    </h1>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
   
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://cheslee-z.github.io/zcl-notes/2022/11/28/SVO-Fast-Semi-Direct-Monocular-Visual-Odometry%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zcl-notes/images/avatar.gif">
+      <meta itemprop="name" content="Chenlong Zhang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chenlong Zhang's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记 | Chenlong Zhang's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
       
-        <h1 id="SVO-Fast-Semi-Direct-Monocular-Visual-Odometry论文阅读笔记"><a href="#SVO-Fast-Semi-Direct-Monocular-Visual-Odometry论文阅读笔记" class="headerlink" title="SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记"></a>SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记</h1><hr>
-<hr>
-<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><ul>
-<li>作者提出了一种半直接单目视觉里程计算法，该算法精确、鲁棒，并且比当前最先进的方法更快<ul>
+
+      <time title="创建时间：2022-11-28 17:24:53 / 修改时间：18:29:40" itemprop="dateCreated datePublished" datetime="2022-11-28T17:24:53+08:00">2022-11-28</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <hr />
+<h2 id="abstract">Abstract</h2>
+<ul>
+<li>作者提出了一种半直接单目视觉里程计算法，该算法精确、鲁棒，并且比当前最先进的方法更快
+<ul>
 <li>该算法无需代价昂贵的特征提取和鲁棒匹配技术</li>
 <li>该算法直接对像素强度进行操作，在高帧率下可以达到亚像素精度</li>
 <li>使用显式建模异常测量的概率建图方法来估计3D点，从而得到更少的异常点和更可靠的点</li>
 <li>精确的高帧率运动估计在纹理较少、重复和高频的场景中具有更高的鲁棒性</li>
-</ul>
-</li>
+</ul></li>
 <li>该算法应用于GPS拒止环境下的微型飞行器状态估计，在机载嵌入式计算机上以55帧/秒的速度运行，在消费级笔记本电脑上以超过300帧/秒的速度运行</li>
 <li>该算法称为SVO (Semi-direct Visual Odometry)，并将软件实现开源</li>
 </ul>
-<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1 Introduction"></a>1 Introduction</h2><h3 id="1-1-Taxonomy-of-Visual-Motion-Estimation-Methods"><a href="#1-1-Taxonomy-of-Visual-Motion-Estimation-Methods" class="headerlink" title="1.1 Taxonomy of Visual Motion Estimation Methods"></a>1.1 Taxonomy of Visual Motion Estimation Methods</h3><ul>
-<li>feature-based methods<ul>
+<span id="more"></span>
+<h2 id="introduction">1 Introduction</h2>
+<h3 id="taxonomy-of-visual-motion-estimation-methods">1.1 Taxonomy of
+Visual Motion Estimation Methods</h3>
+<ul>
+<li>feature-based methods
+<ul>
 <li>依赖于检测和匹配阈值</li>
 <li>需要鲁棒估计技术来处理错误的对应关系</li>
 <li>大多数特征检测器只优化速度而没有优化精度，运动估计中的漂移必须通过平均多个特征测量来补偿</li>
-</ul>
-</li>
+</ul></li>
 <li>direct methods</li>
 </ul>
-<h3 id="1-2-Related-Work"><a href="#1-2-Related-Work" class="headerlink" title="1.2 Related Work"></a>1.2 Related Work</h3><h3 id="1-3-Contributions-and-Outline"><a href="#1-3-Contributions-and-Outline" class="headerlink" title="1.3 Contributions and Outline"></a>1.3 Contributions and Outline</h3><ul>
+<h3 id="related-work">1.2 Related Work</h3>
+<h3 id="contributions-and-outline">1.3 Contributions and Outline</h3>
+<ul>
 <li>SVO使用了特征对应关系，但这是直接运动估计的隐式结果，特征提取只在选择关键帧来初始化新的3D点时需要</li>
 <li>使用显式建模异常点测量的贝叶斯滤波器来估计特征点的深度</li>
-<li>本文的贡献如下：<ol>
+<li>本文的贡献如下：
+<ol type="1">
 <li>一种新颖的半直接VO流程，该方法比现有的最先进的用于MAVs的方法更快更准确</li>
 <li>集成了一种对异常测量具有鲁棒性的概率建图方法</li>
-</ol>
-</li>
+</ol></li>
 </ul>
-<h2 id="2-System-Overview"><a href="#2-System-Overview" class="headerlink" title="2 System Overview"></a>2 System Overview</h2><p><img src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221116110324076.png" alt="image-20221116110324076"></p>
+<h2 id="system-overview">2 System Overview</h2>
+<figure>
+<img
+src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221116110324076.png"
+alt="image-20221116110324076" />
+<figcaption aria-hidden="true">image-20221116110324076</figcaption>
+</figure>
 <ul>
 <li><p>分为运动估计和建图两个并行线程</p>
 <ul>
 <li><p>运动估计线程：</p>
-<ol>
+<ol type="1">
 <li><p>通过基于稀疏模型的图像对齐进行<strong>位姿初始化</strong></p>
 <ul>
 <li>通过最小化同一3D点投影位置对应像素之间的<strong>光度误差</strong>，找到相对于上一帧的相机位姿</li>
-</ul>
-</li>
-<li><p>重投影点对应的2D坐标通过相应的<strong>特征块对齐</strong>进行细化</p>
-</li>
-<li><p>最小化重投影误差来<strong>细化位姿和结构</strong></p>
-</li>
-</ol>
-</li>
+</ul></li>
+<li><p>重投影点对应的2D坐标通过相应的<strong>特征块对齐</strong>进行细化</p></li>
+<li><p>最小化重投影误差来<strong>细化位姿和结构</strong></p></li>
+</ol></li>
 <li><p>建图线程：</p>
-<ol>
+<ol type="1">
 <li>对于每一个待估计3D点的2D特征，初始化一个概率深度滤波器</li>
 </ol>
 <ul>
 <li>当选择一个新的关键帧时会初始化一个新的深度滤波器</li>
 </ul>
-<ol start="2">
+<ol start="2" type="1">
 <li>以Bayesian的形式更新深度估计</li>
-</ol>
-</li>
+</ol></li>
 </ul>
-<ol start="3">
+<ol start="3" type="1">
 <li>当深度滤波器的不确定性足够小时，在地图中插入一个新的3D点</li>
-</ol>
-</li>
+</ol></li>
 </ul>
-<h2 id="3-Notation"><a href="#3-Notation" class="headerlink" title="3 Notation"></a>3 Notation</h2><h2 id="4-Motion-Estimation"><a href="#4-Motion-Estimation" class="headerlink" title="4 Motion Estimation"></a>4 Motion Estimation</h2><h3 id="4-1-Sparse-Model-based-Image-Alignment"><a href="#4-1-Sparse-Model-based-Image-Alignment" class="headerlink" title="4.1 Sparse Model-based Image Alignment"></a>4.1 Sparse Model-based Image Alignment</h3><ul>
-<li><p>连续两帧相机位姿之间的变换矩阵$\mathbf{T}<em>{k,k-1}$的最大似然估计将最小化强度残差的负对数似然：<br>  $$<br>  \mathbf{T}</em>{k, k-1}=\arg \min <em>{\mathbf{T}} \iint</em>{\overline{\mathcal{R}}} \rho[\delta I(\mathbf{T}, \mathbf{u})] d \mathbf{u} \tag{1}<br>  $$</p>
+<h2 id="notation">3 Notation</h2>
+<h2 id="motion-estimation">4 Motion Estimation</h2>
+<h3 id="sparse-model-based-image-alignment">4.1 Sparse Model-based Image
+Alignment</h3>
 <ul>
-<li><p>强度残差$\delta I$由观测到同一个3D点的像素之间的光度误差定义：<br>  $$<br>  \delta I(\mathbf{T}, \mathbf{u})=I_k\left(\underbrace{\pi\left(\underbrace{\mathbf{T} \cdot \underbrace{\pi^{-1}\left(\mathbf{u}, d_{\mathbf{u}}\right)}<em>{(a)}}</em>{(b)}\right)}<em>{c}\right)-I</em>{k-1}(\mathbf{u}) \quad \forall \mathbf{u} \in \overline{\mathcal{R}} \tag{2}<br>  $$</p>
+<li><p>连续两帧相机位姿之间的变换矩阵<span
+class="math inline">\(\mathbf{T}_{k,k-1}\)</span>的最大似然估计将最小化强度残差的负对数似然：
+<span class="math display">\[
+  \mathbf{T}_{k, k-1}=\arg \min _{\mathbf{T}}
+\iint_{\overline{\mathcal{R}}} \rho[\delta I(\mathbf{T}, \mathbf{u})] d
+\mathbf{u} \tag{1}
+  \]</span></p>
 <ul>
-<li>其中$\overline{\mathcal{R}}$是第$k-1$帧深度$d_{\mathbf{u}}$已知的图像域中的反投影点在第$k$帧可见的子图像域</li>
-<li>(a)表示根据第$k-1$帧图像像素坐标及深度逆投影到三维空间</li>
-<li>(b)表示将三维坐标点变换到第$k$帧相机坐标系下</li>
-<li>(c)表示将三维坐标点投影到第$k$帧图像平面</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>假设强度残差服从单位方差的正态分布，最小化负对数似然问题可以转换为最小二乘问题（由于特征点的稀疏性，实际上是最小化特征点周围像素块$\mathbf{I}(\mathbf{u}<em>i)$的强度残差）：<br>  $$<br>  \mathbf{T}</em>{k, k-1}=\arg \min <em>{\mathbf{T}</em>{k, k-1}} \frac{1}{2} \sum_{i \in \overline{\mathcal{R}}}\left|\delta \mathbf{I}\left(\mathbf{T}_{k, k-1}, \mathbf{u}_i\right)\right|^2 \tag{3}<br>  $$</p>
-<p>  ​                                    <img src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119112435187.png" alt="image-20221119112435187"></p>
+<li><p>强度残差<span class="math inline">\(\delta
+I\)</span>由观测到同一个3D点的像素之间的光度误差定义： <span
+class="math display">\[
+  \delta I(\mathbf{T},
+\mathbf{u})=I_k\left(\underbrace{\pi\left(\underbrace{\mathbf{T} \cdot
+\underbrace{\pi^{-1}\left(\mathbf{u},
+d_{\mathbf{u}}\right)}_{(a)}}_{(b)}\right)}_{c}\right)-I_{k-1}(\mathbf{u})
+\quad \forall \mathbf{u} \in \overline{\mathcal{R}} \tag{2}
+  \]</span></p>
+<ul>
+<li>其中<span
+class="math inline">\(\overline{\mathcal{R}}\)</span>是第<span
+class="math inline">\(k-1\)</span>帧深度<span
+class="math inline">\(d_{\mathbf{u}}\)</span>已知的图像域中的反投影点在第<span
+class="math inline">\(k\)</span>帧可见的子图像域</li>
+<li>(a)表示根据第<span
+class="math inline">\(k-1\)</span>帧图像像素坐标及深度逆投影到三维空间</li>
+<li>(b)表示将三维坐标点变换到第<span
+class="math inline">\(k\)</span>帧相机坐标系下</li>
+<li>(c)表示将三维坐标点投影到第<span
+class="math inline">\(k\)</span>帧图像平面</li>
+</ul></li>
+</ul></li>
+<li><p>假设强度残差服从单位方差的正态分布，最小化负对数似然问题可以转换为最小二乘问题（由于特征点的稀疏性，实际上是最小化特征点周围像素块<span
+class="math inline">\(\mathbf{I}(\mathbf{u}_i)\)</span>的强度残差）：
+<span class="math display">\[
+  \mathbf{T}_{k, k-1}=\arg \min _{\mathbf{T}_{k, k-1}} \frac{1}{2}
+\sum_{i \in \overline{\mathcal{R}}}\left\|\delta
+\mathbf{I}\left(\mathbf{T}_{k, k-1}, \mathbf{u}_i\right)\right\|^2
+\tag{3}
+  \]</span></p>
+<p>​ <img
+src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119112435187.png"
+alt="image-20221119112435187" /></p>
 <ul>
 <li><p>通过Gauss-Newton法求解该非线性优化问题</p>
 <ul>
-<li><p>给定变换矩阵的一个估计$\hat{\mathbf{T}}_{k, k-1}$，该估计值的增量更新$\mathbf{T}(\xi)$可以用$\xi \in \mathfrak{s e}(3)$参数化</p>
-</li>
-<li><p>强度残差使用逆构造公式（inverse compositional formulation）[27]重新表述为：<br>  $$<br>  \delta \mathbf{I}\left(\xi, \mathbf{u}_i\right)=\mathbf{I}<em>k\left(\pi\left(\hat{\mathbf{T}}</em>{k, k-1} \cdot \mathbf{p}<em>i\right)\right)-\mathbf{I}</em>{k-1}\left(\pi\left(\mathbf{T}(\xi) \cdot \mathbf{p}_i\right)\right) \tag{4}<br>  $$</p>
+<li><p>给定变换矩阵的一个估计<span
+class="math inline">\(\hat{\mathbf{T}}_{k,
+k-1}\)</span>，该估计值的增量更新<span
+class="math inline">\(\mathbf{T}(\xi)\)</span>可以用<span
+class="math inline">\(\xi \in \mathfrak{s e}(3)\)</span>参数化</p></li>
+<li><p>强度残差使用逆构造公式（inverse compositional
+formulation）[27]重新表述为： <span class="math display">\[
+  \delta \mathbf{I}\left(\xi,
+\mathbf{u}_i\right)=\mathbf{I}_k\left(\pi\left(\hat{\mathbf{T}}_{k, k-1}
+\cdot
+\mathbf{p}_i\right)\right)-\mathbf{I}_{k-1}\left(\pi\left(\mathbf{T}(\xi)
+\cdot \mathbf{p}_i\right)\right) \tag{4}
+  \]</span></p>
 <ul>
-<li>其中$\mathbf{p}_i=\pi^{-1}\left(\mathbf{u}<em>i, d</em>{\mathbf{u}_i}\right)$</li>
-<li><input disabled="" type="checkbox"> 文献[27]中逆构造公式的推导</li>
-</ul>
-</li>
-<li><p>通过正规方程计算最优更新步长$\mathbf{T}(\xi)$：<br>  $$<br>  \mathbf{J}_i^T\mathbf{J}_i \xi = -\mathbf{J}^T_i \delta \mathbf{I}(0,\mathbf{u}_i) \tag{5}<br>  $$</p>
+<li>其中<span
+class="math inline">\(\mathbf{p}_i=\pi^{-1}\left(\mathbf{u}_i,
+d_{\mathbf{u}_i}\right)\)</span></li>
+<li><input type="checkbox" disabled="" />文献[27]中逆构造公式的推导</li>
+</ul></li>
+<li><p>通过正规方程计算最优更新步长<span
+class="math inline">\(\mathbf{T}(\xi)\)</span>： <span
+class="math display">\[
+  \mathbf{J}_i^T\mathbf{J}_i \xi = -\mathbf{J}^T_i \delta
+\mathbf{I}(0,\mathbf{u}_i) \tag{5}
+  \]</span></p>
 <ul>
-<li>其中<br>  $$<br>  \begin{aligned}<br>  \mathbf{J}<em>i &amp;= \nabla \delta \mathbf{I}\left(0, \mathbf{u}<em>i\right)=\left. \frac{\partial \delta \mathbf{I}\left(\xi, \mathbf{u}<em>i\right)}{\partial \xi}\right|</em>{\xi=0}<br>  \&amp;=\left.\left.\left.\frac{\partial \mathbf{I}</em>{k-1}(\mathbf{a})}{\partial \mathbf{a}}\right|</em>{\mathbf{a}=\mathbf{u}<em>i} \cdot \frac{\partial \pi(\mathbf{b})}{\partial \mathbf{b}}\right|</em>{\mathbf{b}=\mathbf{p}<em>i} \cdot \frac{\partial \mathbf{T}(\xi)}{\partial \xi}\right|</em>{\xi=0} \cdot \mathbf{p}_i<br>  \end{aligned}<br>  $$</li>
+<li>其中 <span class="math display">\[
+  \begin{aligned}
+  \mathbf{J}_i &amp;= \nabla \delta \mathbf{I}\left(0,
+\mathbf{u}_i\right)=\left. \frac{\partial \delta \mathbf{I}\left(\xi,
+\mathbf{u}_i\right)}{\partial \xi}\right|_{\xi=0}
+  \\&amp;=\left.\left.\left.\frac{\partial
+\mathbf{I}_{k-1}(\mathbf{a})}{\partial
+\mathbf{a}}\right|_{\mathbf{a}=\mathbf{u}_i} \cdot \frac{\partial
+\pi(\mathbf{b})}{\partial \mathbf{b}}\right|_{\mathbf{b}=\mathbf{p}_i}
+\cdot \frac{\partial \mathbf{T}(\xi)}{\partial \xi}\right|_{\xi=0} \cdot
+\mathbf{p}_i
+  \end{aligned}
+  \]</span></li>
+</ul></li>
+<li><p>更新当前状态<span class="math inline">\(\hat{\mathbf{T}}_{k, k-1}
+\longleftarrow \hat{\mathbf{T}}_{k, k-1} \cdot
+\mathbf{T}(\xi)^{-1}\)</span></p></li>
+</ul></li>
+</ul></li>
 </ul>
-</li>
-<li><p>更新当前状态$\hat{\mathbf{T}}<em>{k, k-1} \longleftarrow \hat{\mathbf{T}}</em>{k, k-1} \cdot \mathbf{T}(\xi)^{-1}$</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="4-2-Relaxation-Through-Feature-Alignment"><a href="#4-2-Relaxation-Through-Feature-Alignment" class="headerlink" title="4.2 Relaxation Through Feature Alignment"></a>4.2 Relaxation Through Feature Alignment</h3><ul>
-<li><p>通过帧间匹配估计相机位姿的方式会产生累积漂移，需要通过相机位姿与地图对齐来进一步约束相机位姿</p>
-</li>
-<li><p>将地图点反投影到第$k$帧图像得到对应的2D特征点坐标$\mathbf{u}_i^{\prime}$，然后通过最小化第$k$帧图像中的特征像素块相对于关键帧$r$中的参考特征像素块的光度误差来优化它：<br>  $$<br>  \mathbf{u}_i^{\prime}=\arg \min _{\mathbf{u}_i^{\prime}} \frac{1}{2}\left|\mathbf{I}_k\left(\mathbf{u}_i^{\prime}\right)-\mathbf{A}_i \cdot \mathbf{I}_r\left(\mathbf{u}_i\right)\right|^2, \quad \forall i \tag{6}<br>  $$</p>
+<h3 id="relaxation-through-feature-alignment">4.2 Relaxation Through
+Feature Alignment</h3>
 <ul>
-<li>对参考特征像素块使用仿射变换$\mathbf{A}_i$是因为关键帧中使用了更大的特征像素块尺寸，并且最近的关键帧通常比上一帧图像离当前帧更远</li>
+<li><p>通过帧间匹配估计相机位姿的方式会产生累积漂移，需要通过相机位姿与地图对齐来进一步约束相机位姿</p></li>
+<li><p>将地图点反投影到第<span
+class="math inline">\(k\)</span>帧图像得到对应的2D特征点坐标<span
+class="math inline">\(\mathbf{u}_i^{\prime}\)</span>，然后通过最小化第<span
+class="math inline">\(k\)</span>帧图像中的特征像素块相对于关键帧<span
+class="math inline">\(r\)</span>中的参考特征像素块的光度误差来优化它：
+<span class="math display">\[
+  \mathbf{u}_i^{\prime}=\arg \min _{\mathbf{u}_i^{\prime}}
+\frac{1}{2}\left\|\mathbf{I}_k\left(\mathbf{u}_i^{\prime}\right)-\mathbf{A}_i
+\cdot \mathbf{I}_r\left(\mathbf{u}_i\right)\right\|^2, \quad \forall i
+\tag{6}
+  \]</span></p>
+<ul>
+<li>对参考特征像素块使用仿射变换<span
+class="math inline">\(\mathbf{A}_i\)</span>是因为关键帧中使用了更大的特征像素块尺寸，并且最近的关键帧通常比上一帧图像离当前帧更远</li>
 </ul>
-<p>  <img src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119112019772.png" alt="image-20221119112019772"></p>
-</li>
-<li><p>该阶段可以理解为违背对极约束的松弛过程，使特征像素块之间具有更高的相关性（亚像素级精度）</p>
-</li>
+<figure>
+<img
+src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119112019772.png"
+alt="image-20221119112019772" />
+<figcaption aria-hidden="true">image-20221119112019772</figcaption>
+</figure></li>
+<li><p>该阶段可以理解为违背对极约束的松弛过程，使特征像素块之间具有更高的相关性（亚像素级精度）</p></li>
 </ul>
-<h3 id="4-3-Pose-and-Structure-Refinement"><a href="#4-3-Pose-and-Structure-Refinement" class="headerlink" title="4.3 Pose and Structure Refinement"></a>4.3 Pose and Structure Refinement</h3><ol>
-<li><p>执行motion-only BA，通过最小化重投影残差来优化相机位姿$\mathbf{T}<em>{k, w}$：<br> $$<br> \mathbf{T}</em>{k, w}=\arg \min <em>{\mathbf{T}</em>{k, w}} \frac{1}{2} \sum_i\left|\mathbf{u}<em>i-\pi\left(\mathbf{T}</em>{k, w} w \mathbf{p}_i\right)\right|^2 \tag{7}<br> $$</p>
+<h3 id="pose-and-structure-refinement">4.3 Pose and Structure
+Refinement</h3>
+<ol type="1">
+<li><p>执行motion-only BA，通过最小化重投影残差来优化相机位姿<span
+class="math inline">\(\mathbf{T}_{k, w}\)</span>： <span
+class="math display">\[
+\mathbf{T}_{k, w}=\arg \min _{\mathbf{T}_{k, w}} \frac{1}{2}
+\sum_i\left\|\mathbf{u}_i-\pi\left(\mathbf{T}_{k, w} w
+\mathbf{p}_i\right)\right\|^2 \tag{7}
+\]</span></p>
 <blockquote>
 <p><strong>注意：</strong>此处误差是像素坐标差异而不是光度误差</p>
-</blockquote>
-</li>
-<li><p>执行structure-only BA，通过最小化重投影残差来优化3D点位姿</p>
-</li>
+</blockquote></li>
+<li><p>执行structure-only
+BA，通过最小化重投影残差来优化3D点位姿</p></li>
 <li><p>执行local BA，联合优化关键帧相机位姿和3D点位置</p>
-<p> <img src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119113816645.png" alt="image-20221119113816645"></p>
-</li>
+<figure>
+<img
+src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221119113816645.png"
+alt="image-20221119113816645" />
+<figcaption aria-hidden="true">image-20221119113816645</figcaption>
+</figure></li>
 </ol>
-<h3 id="4-4-Discussion"><a href="#4-4-Discussion" class="headerlink" title="4.4 Discussion"></a>4.4 Discussion</h3><ul>
-<li>讨论了上述三个阶段不可割裂的关系<ul>
+<h3 id="discussion">4.4 Discussion</h3>
+<ul>
+<li>讨论了上述三个阶段不可割裂的关系
+<ul>
 <li>稀疏图像对齐阶段隐式地满足了对极约束，并进行了异常点检测</li>
 <li>后两个阶段显著地减少了漂移</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h2 id="5-Mapping"><a href="#5-Mapping" class="headerlink" title="5 Mapping"></a>5 Mapping</h2><ul>
-<li><p>给定一张图像及其位姿$\left{I_k, \mathbf{T}_{k, w}\right}$，建图线程估计对应的3D点未知的2D特征点的深度</p>
+<h2 id="mapping">5 Mapping</h2>
+<ul>
+<li><p>给定一张图像及其位姿<span class="math inline">\(\left\{I_k,
+\mathbf{T}_{k,
+w}\right\}\)</span>，建图线程估计对应的3D点未知的2D特征点的深度</p>
 <ul>
 <li>特征点的深度估计采用概率分布建模</li>
 <li>基于[28]后续观测被用于在贝叶斯框架下更新分布</li>
 <li>当分布的方差足够小时，2D特征点对应的3D点被插入到地图中，并立即用于运动估计</li>
-</ul>
-</li>
-<li><p>每个深度滤波器与一个参考关键帧$r$中的参考像素块$\mathbf{u}_i$（特征角点）相关联，深度均值初始化为参考帧的平均景深，但具有较高的深度不确定性</p>
-</li>
-<li><p>对于每个后续观测$\left{I_k, \mathbf{T}_{k, w}\right}$，在新图像$I_k$的极线上搜索一个与参考像素块$\mathbf{u}_i$相关性最高的像素块$\mathbf{u}_i^{\prime}$，并通过三角化获得对应的深度$\tilde{d}_i^k$</p>
-</li>
-<li><p>测量$\tilde{d}_i^k$使用高斯+均匀混合模型分布[28]建模</p>
+</ul></li>
+<li><p>每个深度滤波器与一个参考关键帧<span
+class="math inline">\(r\)</span>中的参考像素块<span
+class="math inline">\(\mathbf{u}_i\)</span>（特征角点）相关联，深度均值初始化为参考帧的平均景深，但具有较高的深度不确定性</p></li>
+<li><p>对于每个后续观测<span class="math inline">\(\left\{I_k,
+\mathbf{T}_{k, w}\right\}\)</span>，在新图像<span
+class="math inline">\(I_k\)</span>的极线上搜索一个与参考像素块<span
+class="math inline">\(\mathbf{u}_i\)</span>相关性最高的像素块<span
+class="math inline">\(\mathbf{u}_i^{\prime}\)</span>，并通过三角化获得对应的深度<span
+class="math inline">\(\tilde{d}_i^k\)</span></p></li>
+<li><p>测量<span
+class="math inline">\(\tilde{d}_i^k\)</span>使用高斯+均匀混合模型分布[28]建模</p>
 <ul>
-<li><p>正常测量值在真实深度$d_i$附近服从正态分布，异常测量值在区间$[d_i^{min}, d_i^{max}]$内服从均匀分布<br>  $$<br>  p\left(\tilde{d}_i^k \mid d_i, \rho_i\right)=\rho_i \mathcal{N}\left(\tilde{d}_i^k \mid d_i, \tau_i^2\right)+\left(1-\rho_i\right) \mathcal{U}\left(\tilde{d}_i^k \mid d_i^{\min }, d_i^{\max }\right) \tag{8}<br>  $$</p>
+<li><p>正常测量值在真实深度<span
+class="math inline">\(d_i\)</span>附近服从正态分布，异常测量值在区间<span
+class="math inline">\([d_i^{min}, d_i^{max}]\)</span>内服从均匀分布
+<span class="math display">\[
+  p\left(\tilde{d}_i^k \mid d_i, \rho_i\right)=\rho_i
+\mathcal{N}\left(\tilde{d}_i^k \mid d_i,
+\tau_i^2\right)+\left(1-\rho_i\right) \mathcal{U}\left(\tilde{d}_i^k
+\mid d_i^{\min }, d_i^{\max }\right) \tag{8}
+  \]</span></p>
 <ul>
-<li>其中$\rho_i $是内点概率</li>
+<li>其中$_i $是内点概率</li>
+</ul></li>
+<li><p><input type="checkbox"
+disabled="" />该模型的递归Bayesian更新步骤在文献[28]中详细介绍</p></li>
 </ul>
-</li>
-<li><p><input disabled="" type="checkbox">  该模型的递归Bayesian更新步骤在文献[28]中详细介绍</p>
-</li>
+<figure>
+<img
+src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221120163927499.png"
+alt="image-20221120163927499" />
+<figcaption aria-hidden="true">image-20221120163927499</figcaption>
+</figure></li>
+<li><p>作者使用逆深度坐标来处理大场景深度</p></li>
 </ul>
-<p>  <img src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221120163927499.png" alt="image-20221120163927499"></p>
-</li>
-<li><p>作者使用逆深度坐标来处理大场景深度</p>
-</li>
-</ul>
-<h2 id="6-Implementation-Details"><a href="#6-Implementation-Details" class="headerlink" title="6 Implementation Details"></a>6 Implementation Details</h2><ul>
-<li>SVO的初始化过程<ul>
+<h2 id="implementation-details">6 Implementation Details</h2>
+<ul>
+<li>SVO的初始化过程
+<ul>
 <li>假设前两个关键帧所拍到的特征点在同一个平面上（下视相机），然后估计单应性矩阵，并通过三角化来估计初始特征点的深度值</li>
-</ul>
-</li>
-<li>为了应对快速运动的情形，SVO使用由粗到精（coarse-to-fine）的方案执行稀疏图像对齐<ol>
+</ul></li>
+<li>为了应对快速运动的情形，SVO使用由粗到精（coarse-to-fine）的方案执行稀疏图像对齐
+<ol type="1">
 <li>对图像进行半采样从而创建五层图像金字塔</li>
 <li>先在最粗糙的层上优化强度残差直至收敛，随后在更精细的层上优化</li>
 <li>在第三层金字塔收敛后终止该过程</li>
-</ol>
-</li>
-<li>SVO在地图中保存固定数量的关键帧用于特征对齐和结构细化<ul>
+</ol></li>
+<li>SVO在地图中保存固定数量的关键帧用于特征对齐和结构细化
+<ul>
 <li>关键帧选择的标准：新帧相对于最近关键帧的欧氏距离超过平均景深的12%</li>
-</ul>
-</li>
-<li>SVO在建图线程中将图像划分为固定大小的单元格（30×30像素），来确保特征（每个单元格中Shi-Tomasi得分最高的Fast关键点）的均匀分布<ul>
+</ul></li>
+<li>SVO在建图线程中将图像划分为固定大小的单元格（30×30像素），来确保特征（每个单元格中Shi-Tomasi得分最高的Fast关键点）的均匀分布
+<ul>
 <li>在图像金字塔的每一层均提取Fast角点来需要与尺度无关的最佳角点</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h2 id="7-Experimental-Results"><a href="#7-Experimental-Results" class="headerlink" title="7 Experimental Results"></a>7 Experimental Results</h2><ul>
+<h2 id="experimental-results">7 Experimental Results</h2>
+<ul>
 <li>实验在MAV搭载的下视相机记录的数据集和手持相机采集的视频序列中进行</li>
 <li>SVO最多使用2个CPU核心</li>
 <li>将SVO与PTAM的修改版本[2]进行比较</li>
 </ul>
-<h3 id="7-1-Accuracy"><a href="#7-1-Accuracy" class="headerlink" title="7.1 Accuracy"></a>7.1 Accuracy</h3><ul>
+<h3 id="accuracy">7.1 Accuracy</h3>
+<ul>
 <li>使用文献[31]的方法，将前10帧与真值对齐，来生成误差演变图</li>
 <li>受到文献[32]的启发，还计算了每秒的平均漂移</li>
 <li>尺度漂移是通过比较相对平均的欧几里得范数和真值来计算的</li>
 <li>重投影误差在特征对齐步骤中产生</li>
 <li>local BA的作用并不大</li>
 </ul>
-<h3 id="7-2-Runtime-Evaluation"><a href="#7-2-Runtime-Evaluation" class="headerlink" title="7.2 Runtime Evaluation"></a>7.2 Runtime Evaluation</h3><ul>
+<h3 id="runtime-evaluation">7.2 Runtime Evaluation</h3>
+<ul>
 <li>运动估计线程所需时间分解</li>
 </ul>
-<p><img src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221120175355256.png" alt="image-20221120175355256"></p>
+<figure>
+<img
+src="https://figure-bed-1300862044.cos.ap-beijing.myqcloud.com/ImageImageimage-20221120175355256.png"
+alt="image-20221120175355256" />
+<figcaption aria-hidden="true">image-20221120175355256</figcaption>
+</figure>
 <ul>
-<li>建图线程<ul>
+<li>建图线程
+<ul>
 <li>用新帧更新所有深度滤波器所需的时间在很大程度上取决于滤波器的数量</li>
 <li>选择新的关键帧后滤波器的数量会增多，但随着滤波器收敛会迅速减少</li>
 <li>平均而言，建图线程比运动估计线程快</li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h3 id="7-3-Robustness"><a href="#7-3-Robustness" class="headerlink" title="7.3 Robustness"></a>7.3 Robustness</h3><ul>
+<h3 id="robustness">7.3 Robustness</h3>
+<ul>
 <li>因为深度滤波器的实验，SVO生成的地图中几乎没有异常点，从而使得SVO即使在重复和高频纹理的场景中（如沥青地面、草地）也能收敛</li>
 </ul>
-<h2 id="8-Conclusion"><a href="#8-Conclusion" class="headerlink" title="8 Conclusion"></a>8 Conclusion</h2><ul>
+<h2 id="conclusion">8 Conclusion</h2>
+<ul>
 <li>SVO速度提升的原因是由于运动估计不需要特征提取和匹配</li>
 </ul>
-<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
-<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/heyijia0327/article/details/51083398">svo： semi-direct visual odometry 论文解析</a></li>
+<h2 id="参考文献">参考文献</h2>
+<ol type="1">
+<li><a
+target="_blank" rel="noopener" href="https://blog.csdn.net/heyijia0327/article/details/51083398">svo：
+semi-direct visual odometry 论文解析</a></li>
 </ol>
 
-      
     </div>
-    <footer class="article-footer">
-      <a data-url="http://cheslee-z.github.io/zcl-notes/2022/11/28/SVO-Fast-Semi-Direct-Monocular-Visual-Odometry%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/" data-id="clb0l4zu10000nsv8ham19b1f" class="article-share-link">Share</a>
-      
-      
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zcl-notes/tags/SLAM/" rel="tag"># SLAM</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/zcl-notes/2022/11/28/hello-world/" rel="prev" title="Hello World">
+                  <i class="fa fa-chevron-left"></i> Hello World
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
     </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chenlong Zhang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
   </div>
-  
-    
-<nav id="article-nav">
-  
-  
-    <a href="/zcl-notes/2022/11/28/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Hello World</div>
-    </a>
-  
-</nav>
 
-  
-</article>
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-
-  
-    
-
-  
-    
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/zcl-notes/archives/2022/11/">November 2022</a></li></ul>
     </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
   </div>
 
+  <a href="https://github.com/cheslee-z" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
 
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/zcl-notes/2022/11/28/SVO-Fast-Semi-Direct-Monocular-Visual-Odometry%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/">SVO: Fast Semi-Direct Monocular Visual Odometry论文阅读笔记</a>
-          </li>
-        
-          <li>
-            <a href="/zcl-notes/2022/11/28/hello-world/">Hello World</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      &copy; 2022 John Doe<br>
-      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/zcl-notes/" class="mobile-nav-link">Home</a>
-  
-    <a href="/zcl-notes/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
-    
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
 
   
-<link rel="stylesheet" href="/zcl-notes/fancybox/jquery.fancybox.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/zcl-notes/js/comments.js"></script><script src="/zcl-notes/js/utils.js"></script><script src="/zcl-notes/js/motion.js"></script><script src="/zcl-notes/js/schemes/muse.js"></script><script src="/zcl-notes/js/next-boot.js"></script>
 
   
-<script src="/zcl-notes/fancybox/jquery.fancybox.pack.js"></script>
 
 
 
 
-<script src="/zcl-notes/js/script.js"></script>
+  
 
 
 
 
-  </div>
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/zcl-notes/js/third-party/math/mathjax.js"></script>
+
+
+
 </body>
 </html>
