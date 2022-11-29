@@ -178,7 +178,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2022-11-29 12:21:53 / 修改时间：12:21:43" itemprop="dateCreated datePublished" datetime="2022-11-29T12:21:53+08:00">2022-11-29</time>
+      <time title="创建时间：2022-11-29 12:21:53 / 修改时间：12:27:34" itemprop="dateCreated datePublished" datetime="2022-11-29T12:21:53+08:00">2022-11-29</time>
     </span>
 
   
@@ -191,48 +191,25 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>本质矩阵<span class="math inline">\(\boldsymbol{E} =
-\boldsymbol{t}^{\land} \boldsymbol{R}\)</span>的奇异值必定是<span
-class="math inline">\([\sigma, \ \sigma, \
-0]^{T}\)</span>的形式，这称为本质矩阵的内在性质</p>
+          <hr>
+<blockquote>
+<p>本质矩阵$\boldsymbol{E} = \boldsymbol{t}^{\land} \boldsymbol{R}$的奇异值必定是$[\sigma, \ \sigma, \ 0]^{T}$的形式，这称为本质矩阵的内在性质</p>
 </blockquote>
-<h2 id="证明过程">证明过程</h2>
-<p><span class="math inline">\(\because
-\boldsymbol{E}=\boldsymbol{U}\boldsymbol{\Sigma}\boldsymbol{V}^T\)</span></p>
-<p>$ ^T = ^T ( <sup>T)</sup>T = <sup>T</sup>T =^T $</p>
-<p>又<span class="math inline">\(\because\boldsymbol{E}\boldsymbol{E}^T
-= \boldsymbol{t}^{\land} \boldsymbol{R}(\boldsymbol{t}^{\land}
-\boldsymbol{R})^T = \boldsymbol{t}^{\land} \boldsymbol{R}
-\boldsymbol{R}^T \boldsymbol{t}^{\land T} = \boldsymbol{t}^{\land}
-\boldsymbol{t}^{\land T} =\left[\begin{matrix}0 &amp; -t_z &amp; t_y
-\\t_z &amp; 0 &amp; -t_x \\ -t_y &amp; t_x &amp; 0 \end{matrix} \right]
-\left[\begin{matrix}0 &amp; t_z &amp; -t_y \\-t_z &amp; 0 &amp; t_x \\
-t_y &amp; -t_x &amp; 0 \end{matrix} \right]\)</span></p>
-<p>考虑到<span
-class="math inline">\(\boldsymbol{E}\)</span>的尺度等价性（<span
-class="math inline">\(\boldsymbol{E}\)</span>只有5个自由度），将<span
-class="math inline">\(\boldsymbol{t}= [t_x \ t_y \
-t_z]^T\)</span>归一化为单位矢量，即<span class="math inline">\(t_x^2 +
-t_y^2 + t_z^2 = 1\)</span></p>
-<p>那么可由<span class="math inline">\(\left|\lambda \boldsymbol{I} -
-\boldsymbol{E}\boldsymbol{E}^T \right| = 0\)</span>求取<span
-class="math inline">\(\boldsymbol{E}\boldsymbol{E}^T\)</span>的特征值</p>
-<p>行列式展开得<span class="math inline">\(\lambda(\lambda-1)^2=
-0\)</span>，即<span class="math inline">\(\boldsymbol{M} =
-diag(\lambda_1, \lambda_2, \lambda_3) = diag(1, 1, 0)\)</span></p>
-<p>又<span class="math inline">\(\because \boldsymbol{M} =
-\boldsymbol{\Sigma} \boldsymbol{\Sigma}^T\)</span></p>
-<p><span class="math inline">\(\therefore \boldsymbol{\Sigma} = diag(1,
-1, 0)\)</span></p>
+<h2 id="证明过程"><a href="#证明过程" class="headerlink" title="证明过程"></a>证明过程</h2><p>$\because \boldsymbol{E}=\boldsymbol{U}\boldsymbol{\Sigma}\boldsymbol{V}^T$</p>
+<p>$\therefore \boldsymbol{E} \boldsymbol{E}^T = \boldsymbol{U}\boldsymbol{\Sigma} \boldsymbol{V}^T (\boldsymbol{U} \boldsymbol{\Sigma} \boldsymbol{V}^T)^T  = \boldsymbol{U} \boldsymbol{\Sigma} \boldsymbol{\Sigma}^T\boldsymbol{U}^T =\boldsymbol{U}\boldsymbol{M}\boldsymbol{U}^T $</p>
+<p>又$\because\boldsymbol{E}\boldsymbol{E}^T = \boldsymbol{t}^{\land} \boldsymbol{R}(\boldsymbol{t}^{\land} \boldsymbol{R})^T = \boldsymbol{t}^{\land} \boldsymbol{R} \boldsymbol{R}^T \boldsymbol{t}^{\land T} = \boldsymbol{t}^{\land} \boldsymbol{t}^{\land T} =\left[\begin{matrix}0 &amp; -t_z &amp; t_y \t_z &amp; 0 &amp; -t_x \ -t_y &amp; t_x &amp; 0 \end{matrix} \right]  \left[\begin{matrix}0 &amp; t_z &amp; -t_y \-t_z &amp; 0 &amp; t_x \ t_y &amp; -t_x &amp; 0 \end{matrix} \right]$</p>
+<p>考虑到$\boldsymbol{E}$的尺度等价性（$\boldsymbol{E}$只有5个自由度），将$\boldsymbol{t}= [t_x \ t_y \ t_z]^T$归一化为单位矢量，即$t_x^2 + t_y^2 + t_z^2 = 1$</p>
+<p>那么可由$\left|\lambda \boldsymbol{I} - \boldsymbol{E}\boldsymbol{E}^T  \right| = 0$求取$\boldsymbol{E}\boldsymbol{E}^T$的特征值</p>
+<p>行列式展开得$\lambda(\lambda-1)^2= 0$，即$\boldsymbol{M} = diag(\lambda_1, \lambda_2, \lambda_3) = diag(1, 1, 0)$</p>
+<p>又$\because \boldsymbol{M} = \boldsymbol{\Sigma} \boldsymbol{\Sigma}^T$</p>
+<p>$\therefore \boldsymbol{\Sigma} = diag(1, 1, 0)$</p>
 <p>得证</p>
 <ul>
 <li>PS:《计算机视觉中的多视图几何》第九章也给出了证明，但需要更强的数学基础</li>
 </ul>
-<hr />
-<h2 id="参考文献">参考文献</h2>
-<ol type="1">
-<li>https://blog.csdn.net/zengxyuyu/article/details/106676509</li>
+<hr>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/zengxyuyu/article/details/106676509">https://blog.csdn.net/zengxyuyu/article/details/106676509</a></li>
 <li>《视觉SLAM十四讲》第二版</li>
 <li>《计算机视觉中的多视图几何》第二版</li>
 </ol>
