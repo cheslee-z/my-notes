@@ -20,18 +20,17 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"cheslee-z.github.io","root":"/zcl-notes/","images":"/zcl-notes/images","scheme":"Pisces","darkmode":true,"version":"8.13.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/zcl-notes/js/config.js"></script>
 
-    <meta name="description" content="奇异值分解（SVD）： 设\(\boldsymbol{A} \in \mathbb{C}^{m \times n}_r\)，则存在正交矩阵\(\boldsymbol{U} \in \mathbb{C}^{m \times m}\)与正交矩阵\(\boldsymbol{V} \in \mathbb{C}^{n \times n}\)使得\(\boldsymbol{A} &#x3D; \bolds">
+    <meta name="description" content="奇异值分解求解线性方程组  奇异值分解（SVD）： 设\(\boldsymbol{A} \in \mathbb{C}^{m \times n}_r\)，则存在正交矩阵\(\boldsymbol{U} \in \mathbb{C}^{m \times m}\)与正交矩阵\(\boldsymbol{V} \in \mathbb{C}^{n \times n}\)使得\(\boldsymbo">
 <meta property="og:type" content="article">
-<meta property="og:title" content="奇异值分解求解线性方程组">
+<meta property="og:title" content="Chenlong Zhang&#39;s Blog">
 <meta property="og:url" content="http://cheslee-z.github.io/zcl-notes/2022/11/30/%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%E6%B1%82%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84/index.html">
 <meta property="og:site_name" content="Chenlong Zhang&#39;s Blog">
-<meta property="og:description" content="奇异值分解（SVD）： 设\(\boldsymbol{A} \in \mathbb{C}^{m \times n}_r\)，则存在正交矩阵\(\boldsymbol{U} \in \mathbb{C}^{m \times m}\)与正交矩阵\(\boldsymbol{V} \in \mathbb{C}^{n \times n}\)使得\(\boldsymbol{A} &#x3D; \bolds">
+<meta property="og:description" content="奇异值分解求解线性方程组  奇异值分解（SVD）： 设\(\boldsymbol{A} \in \mathbb{C}^{m \times n}_r\)，则存在正交矩阵\(\boldsymbol{U} \in \mathbb{C}^{m \times m}\)与正交矩阵\(\boldsymbol{V} \in \mathbb{C}^{n \times n}\)使得\(\boldsymbo">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-11-30T09:27:53.000Z">
-<meta property="article:modified_time" content="2022-11-30T09:31:03.202Z">
+<meta property="article:published_time" content="2022-11-30T09:26:52.950Z">
+<meta property="article:modified_time" content="2022-12-01T08:09:08.357Z">
 <meta property="article:author" content="Chenlong Zhang">
 <meta property="article:tag" content="SLAM">
-<meta property="article:tag" content="数学">
 <meta name="twitter:card" content="summary">
 
 
@@ -39,10 +38,10 @@
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://cheslee-z.github.io/zcl-notes/2022/11/30/%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%E6%B1%82%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84/","path":"2022/11/30/奇异值分解求解线性方程组/","title":"奇异值分解求解线性方程组"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://cheslee-z.github.io/zcl-notes/2022/11/30/%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%E6%B1%82%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84/","path":"2022/11/30/奇异值分解求解线性方程组/","title":""}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>奇异值分解求解线性方程组 | Chenlong Zhang's Blog</title>
+<title> | Chenlong Zhang's Blog</title>
   
 
 
@@ -110,11 +109,11 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%82%E8%A7%A3%E9%BD%90%E6%AC%A1%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84boldsymbolaboldsymbolx-boldsymbol0"><span class="nav-number">1.</span> <span class="nav-text">1
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%E6%B1%82%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text">奇异值分解求解线性方程组</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%82%E8%A7%A3%E9%BD%90%E6%AC%A1%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84boldsymbolaboldsymbolx-boldsymbol0"><span class="nav-number">1.1.</span> <span class="nav-text">1
 求解齐次线性方程组（\(\boldsymbol{A}\boldsymbol{x}&#x3D;
-\boldsymbol{0}\)）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%82%E8%A7%A3%E9%9D%9E%E9%BD%90%E6%AC%A1%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84boldsymbolaboldsymbolx-boldsymbolb"><span class="nav-number">2.</span> <span class="nav-text">2
+\boldsymbol{0}\)）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%82%E8%A7%A3%E9%9D%9E%E9%BD%90%E6%AC%A1%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84boldsymbolaboldsymbolx-boldsymbolb"><span class="nav-number">1.2.</span> <span class="nav-text">2
 求解非齐次线性方程组（\(\boldsymbol{A}\boldsymbol{x}&#x3D;
-\boldsymbol{b}\)）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">3.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+\boldsymbol{b}\)）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">1.3.</span> <span class="nav-text">参考文献</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -127,12 +126,12 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/zcl-notes/archives/">
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">1</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -172,12 +171,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="奇异值分解求解线性方程组 | Chenlong Zhang's Blog">
+      <meta itemprop="name" content=" | Chenlong Zhang's Blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          奇异值分解求解线性方程组
+          
         </h1>
 
         <div class="post-meta-container">
@@ -187,9 +186,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2022-11-30 17:27:53 / 修改时间：17:31:03" itemprop="dateCreated datePublished" datetime="2022-11-30T17:27:53+08:00">2022-11-30</time>
+      <time title="创建时间：2022-11-30 17:26:52" itemprop="dateCreated datePublished" datetime="2022-11-30T17:26:52+08:00">2022-11-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-12-01 16:09:08" itemprop="dateModified" datetime="2022-12-01T16:09:08+08:00">2022-12-01</time>
     </span>
 
   
@@ -202,7 +207,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <blockquote>
+        <h1 id="奇异值分解求解线性方程组">奇异值分解求解线性方程组</h1>
+<blockquote>
 <p><strong>奇异值分解（SVD）</strong>：</p>
 <p>设<span class="math inline">\(\boldsymbol{A} \in \mathbb{C}^{m \times
 n}_r\)</span>，则存在正交矩阵<span class="math inline">\(\boldsymbol{U}
@@ -224,21 +230,23 @@ class="math inline">\(\boldsymbol{A}\)</span>的正奇异值</p>
 求解齐次线性方程组（<span
 class="math inline">\(\boldsymbol{A}\boldsymbol{x}=
 \boldsymbol{0}\)</span>）</h2>
-问题等价于<span class="math inline">\(min||
+问题等价于<span class="math inline">\(\min _{\boldsymbol{x}}||
 \boldsymbol{A}\boldsymbol{x}||^2\)</span>，则 $$
 <span class="math display">\[\begin{aligned}
-&amp; min|| \boldsymbol{A}\boldsymbol{x}||^2 \\
-= &amp; min || \boldsymbol{U}   \boldsymbol{D} \boldsymbol{V}^T
+&amp; \min _{\boldsymbol{x}}|| \boldsymbol{A}\boldsymbol{x}||^2 \\
+= &amp; \min _{\boldsymbol{x}} || \boldsymbol{U}   \boldsymbol{D}
+\boldsymbol{V}^T \boldsymbol{x}||^2 \\
+= &amp; \min _{\boldsymbol{x}} ||  \boldsymbol{D} \boldsymbol{V}^T
 \boldsymbol{x}||^2 \\
-= &amp; min ||  \boldsymbol{D} \boldsymbol{V}^T \boldsymbol{x}||^2 \\
 
 \end{aligned} \tag{1}\]</span>
 <p>$$ 令<span class="math inline">\(\boldsymbol{y} = \boldsymbol{V}^T
 \boldsymbol{x}\)</span>，则<span
-class="math inline">\((1)\)</span>式变为<span class="math inline">\(min
-|| \boldsymbol{D} \boldsymbol{y} ||^2 = min(\sigma_1^2y_1^2 +
-\sigma_2^2y_2^2 + ... + \sigma_r^2y_r^2)\)</span>，其中<span
-class="math inline">\(r &lt;= n\)</span></p>
+class="math inline">\((1)\)</span>式变为<span class="math inline">\(\min
+_{\boldsymbol{y}} || \boldsymbol{D} \boldsymbol{y} ||^2 = \min
+_{\boldsymbol{y}}\left(\sigma_1^2y_1^2 + \sigma_2^2y_2^2 + ... +
+\sigma_r^2y_r^2\right)\)</span>，其中<span class="math inline">\(r &lt;=
+n\)</span></p>
 <p>因为<span class="math inline">\(\sigma_1 &gt; \sigma_2 &gt; ... &gt;
 \sigma_r &gt; 0\)</span>，所有不管<span
 class="math inline">\(r\)</span>是否等于<span
@@ -255,24 +263,25 @@ class="math inline">\(\boldsymbol{V}\)</span>的最后一列</p>
 求解非齐次线性方程组（<span
 class="math inline">\(\boldsymbol{A}\boldsymbol{x}=
 \boldsymbol{b}\)</span>）</h2>
-<p>问题等价于<span class="math inline">\(min||
+<p>问题等价于<span class="math inline">\(\min _{\boldsymbol{x}} ||
 \boldsymbol{A}\boldsymbol{x}-\boldsymbol{b}||^2\)</span>，则 <span
 class="math display">\[
 \begin{aligned}
-&amp; min|| \boldsymbol{A}\boldsymbol{x}-\boldsymbol{b}||^2 \\
-= &amp; min || \boldsymbol{U}   \boldsymbol{D} \boldsymbol{V}^T
-\boldsymbol{x} -\boldsymbol{b} ||^2 \\
-= &amp; min ||  \boldsymbol{D} \boldsymbol{V}^T \boldsymbol{x}
--\boldsymbol{U}^T\boldsymbol{b} ||^2 \\
+&amp; \min _{\boldsymbol{x}}||
+\boldsymbol{A}\boldsymbol{x}-\boldsymbol{b}||^2 \\
+= &amp; \min _{\boldsymbol{x}} || \boldsymbol{U}   \boldsymbol{D}
+\boldsymbol{V}^T \boldsymbol{x} -\boldsymbol{b} ||^2 \\
+= &amp; \min _{\boldsymbol{x}} ||  \boldsymbol{D} \boldsymbol{V}^T
+\boldsymbol{x} -\boldsymbol{U}^T\boldsymbol{b} ||^2 \\
 \end{aligned} \tag{2}
 \]</span> 令<span class="math inline">\(\boldsymbol{y} =
 \boldsymbol{V}^T \boldsymbol{x}\)</span>，<span
 class="math inline">\(\boldsymbol{c} = \boldsymbol{U}^T
 \boldsymbol{b}\)</span>，则<span
-class="math inline">\((2)\)</span>式变为<span class="math inline">\(min
-|| \boldsymbol{D} \boldsymbol{y} - \boldsymbol{c}||^2 = min\left(
-\sum_{i=1}^r(\sigma_i y_i - c_i)^2+\sum_{i=r+1}^m c_i^2
-\right)\)</span></p>
+class="math inline">\((2)\)</span>式变为<span class="math inline">\(\min
+_{\boldsymbol{y}} || \boldsymbol{D} \boldsymbol{y} - \boldsymbol{c}||^2
+= \min _{\boldsymbol{y}}\left( \sum_{i=1}^r(\sigma_i y_i -
+c_i)^2+\sum_{i=r+1}^m c_i^2 \right)\)</span></p>
 <p>当<span class="math inline">\(y_i = \frac{c_i}{\sigma_i}(i =
 1,...,r)\)</span>而<span
 class="math inline">\(y_i(i=r+1,...,n)\)</span>为任意值时求得最优解</p>
@@ -290,10 +299,6 @@ class="math inline">\(y_i(i=r+1,...,n)\)</span>为任意值时求得最优解</p
     
 
     <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/zcl-notes/tags/SLAM/" rel="tag"># SLAM</a>
-              <a href="/zcl-notes/tags/%E6%95%B0%E5%AD%A6/" rel="tag"># 数学</a>
-          </div>
 
         
 
@@ -304,6 +309,9 @@ class="math inline">\(y_i(i=r+1,...,n)\)</span>为任意值时求得最优解</p
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/zcl-notes/2023/03/23/%E6%97%8B%E8%BD%AC%E8%A1%A8%E7%A4%BA%E3%80%81%E8%BD%AC%E6%8D%A2%E5%8F%8A%E6%9B%B4%E6%96%B0/" rel="next" title="旋转表示、转换及更新">
+                  旋转表示、转换及更新 <i class="fa fa-chevron-right"></i>
+                </a>
             </div>
           </div>
     </footer>
@@ -324,7 +332,7 @@ class="math inline">\(y_i(i=r+1,...,n)\)</span>为任意值时求得最优解</p
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

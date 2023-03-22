@@ -117,12 +117,12 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/zcl-notes/archives/">
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">1</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -139,6 +139,237 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://cheslee-z.github.io/zcl-notes/2023/03/23/%E6%97%8B%E8%BD%AC%E8%A1%A8%E7%A4%BA%E3%80%81%E8%BD%AC%E6%8D%A2%E5%8F%8A%E6%9B%B4%E6%96%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zcl-notes/images/avatar.gif">
+      <meta itemprop="name" content="Chenlong Zhang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chenlong Zhang's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Chenlong Zhang's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/zcl-notes/2023/03/23/%E6%97%8B%E8%BD%AC%E8%A1%A8%E7%A4%BA%E3%80%81%E8%BD%AC%E6%8D%A2%E5%8F%8A%E6%9B%B4%E6%96%B0/" class="post-title-link" itemprop="url">旋转表示、转换及更新</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-03-23 11:56:56" itemprop="dateCreated datePublished" datetime="2023-03-23T11:56:56+08:00">2023-03-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-03-22 11:56:52" itemprop="dateModified" datetime="2023-03-22T11:56:52+08:00">2023-03-22</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <hr />
+<p>本文内容均默认使用右手定则，且旋转向量在局部坐标系中表达（即右乘）</p>
+<ul class="task-list">
+<li><input type="checkbox" disabled="" />代码实现</li>
+</ul>
+<h2 id="旋转表示">1. 旋转表示</h2>
+<h3 id="旋转向量">1.1 旋转向量</h3>
+<ul>
+<li>用<span class="math inline">\(\boldsymbol{\phi} = \phi
+\boldsymbol{n}\)</span>表示绕着单位轴<span
+class="math inline">\(\boldsymbol{n}\)</span>旋转<span
+class="math inline">\(\phi\)</span>弧度，用<span
+class="math inline">\(\boldsymbol{\omega}\)</span>表示旋转角速率</li>
+</ul>
+<h3 id="旋转矩阵">1.2 旋转矩阵</h3>
+<ul>
+<li><p>旋转行为： <span class="math display">\[
+  \boldsymbol{x}^{&#39;} = \boldsymbol{R}\boldsymbol{x} \tag{1}
+  \]</span></p></li>
+<li><p>约束： <span class="math display">\[
+  \boldsymbol{R}\boldsymbol{R}^\mathrm{T} =
+\boldsymbol{R}^\mathrm{T}\boldsymbol{R} = \boldsymbol{I}, \quad
+det(\boldsymbol{R}) = 1  \tag{2}
+  \]</span></p></li>
+<li><p>微分： <span class="math display">\[
+  \dot{\boldsymbol{R}}=\boldsymbol{R}\boldsymbol{\omega}^{\wedge}
+\tag{3}
+  \]</span></p></li>
+</ul>
+<h3 id="四元数">1.3 四元数</h3>
+<ul>
+<li><p>表示： <span class="math display">\[
+  \boldsymbol{q}=[s, \boldsymbol{v}]^{\mathrm{T}}, \quad s=q_w \in
+\mathbb{R}, \quad \boldsymbol{v}=\left[q_x, q_y, q_z\right]^{\mathrm{T}}
+\in \mathbb{R}^3 \tag{4}
+  \]</span></p>
+<blockquote>
+<p>只有单位四元数才能表示旋转</p>
+</blockquote></li>
+<li><p>四元数乘法： <span class="math display">\[
+  \mathbf{q}_a \otimes \mathbf{q}_b =\left[\begin{array}{c}
+  s_a s_b-\mathbf{v}_a^{\top} \mathbf{v}_b \\
+  s_a \mathbf{v}_b+s_b \mathbf{v}_a+\mathbf{v}_a \times \mathbf{v}_b
+  \end{array}\right] \tag{5}
+  \]</span></p>
+<blockquote>
+<p>!!!四元数乘法不满足乘法结合律</p>
+</blockquote></li>
+<li><p>旋转行为： <span class="math display">\[
+  \boldsymbol{x}^{&#39;} = \boldsymbol{q} \otimes \boldsymbol{x} \otimes
+\boldsymbol{q}^* \tag{6}
+  \]</span></p></li>
+<li><p>约束： <span class="math display">\[
+  \mathbf{q} \otimes \mathbf{q}^* = \mathbf{q}^* \otimes \mathbf{q}
+=1      \tag{7}
+  \]</span></p></li>
+<li><p>微分： <span class="math display">\[
+  \dot{\mathbf{q}}=\frac{1}{2} \mathbf{q} \otimes
+\boldsymbol{\omega}  \tag{8}
+  \]</span></p></li>
+</ul>
+<h2 id="旋转转换">2. 旋转转换</h2>
+<h3 id="旋转向量与旋转矩阵">2.1 旋转向量与旋转矩阵</h3>
+<h4 id="从旋转向量转换到旋转矩阵的转换">2.1.1
+从旋转向量转换到旋转矩阵的转换</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\boldsymbol{R} &amp;=\exp \left(\boldsymbol{\phi}^{\wedge}\right) =
+\sum_{n=0}^{\infty}
+\frac{1}{n!}\left(\boldsymbol{\phi}^{\wedge}\right)^n  \approx
+\boldsymbol{I}+\boldsymbol{\phi}^{\wedge} \\
+&amp;= \exp \left(\phi \boldsymbol{n}^{\wedge}\right) = \cos \phi
+\boldsymbol{I}+(1-\cos
+\phi)\boldsymbol{n}\boldsymbol{n}^{\mathrm{T}}+\sin \phi
+\boldsymbol{n}^{\wedge}
+\end{aligned}  \tag{9}
+\]</span></p>
+<blockquote>
+<p>式(9)的第二行即<strong>罗德里格斯公式</strong></p>
+</blockquote>
+<h4 id="从旋转矩阵转换到旋转向量的转换">2.1.2
+从旋转矩阵转换到旋转向量的转换</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\phi &amp; =\arccos \frac{\operatorname{tr}(\boldsymbol{R})-1}{2} \\
+\boldsymbol{n} &amp;
+=\frac{\left(\boldsymbol{R}-\boldsymbol{R}^{\top}\right)^{\vee}}{2 \sin
+\phi}
+\end{aligned}  \tag{10}
+\]</span></p>
+<h3 id="旋转向量与四元数">2.2 旋转向量与四元数</h3>
+<h4 id="从旋转向量到四元数的转换">2.2.1 从旋转向量到四元数的转换</h4>
+<p>将<span
+class="math inline">\(\boldsymbol{\phi}\)</span>转换为纯四元数（pure
+quaternion），则有 <span class="math display">\[
+\boldsymbol{q} = exp(\frac{\boldsymbol{\phi}}{2}) =
+\left[\begin{array}{c}
+\cos \frac{\phi}{2} \\
+\boldsymbol{n} \sin \frac{\phi}{2}
+\end{array}\right] \approx
+\left[\begin{array}{c}
+1 \\
+\frac{1}{2}\boldsymbol{\phi}
+\end{array}\right]
+\tag{11}
+\]</span></p>
+<blockquote>
+<p>上式中存在<span
+class="math inline">\(\boldsymbol{\phi}\)</span>到纯四元数（pure
+quaternion）的隐含转换</p>
+</blockquote>
+<h4 id="从四元数到旋转向量的转换">2.2.2 从四元数到旋转向量的转换</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\phi &amp; =2 \arctan \left(||\boldsymbol{v}||, s \right) \\
+\boldsymbol{n} &amp; =\frac{\boldsymbol{v}}{ ||\boldsymbol{v}||}
+\end{aligned} \tag{12}
+\]</span></p>
+<h3 id="旋转矩阵与四元数">2.3 旋转矩阵与四元数</h3>
+<h4 id="从旋转矩阵到四元数的转换">2.3.1 从旋转矩阵到四元数的转换</h4>
+<p><span class="math display">\[
+\left\{
+\begin{aligned}
+q_w = sign(q_w) \frac{1}{2} \sqrt{1+r_{11}+r_{22} + r_{33}} \\
+q_x = sign(q_x) \frac{1}{2} \sqrt{1+r_{11}-r_{22} - r_{33}} \\
+q_y = sign(q_y) \frac{1}{2} \sqrt{1-r_{11}+r_{22} - r_{33}} \\
+q_z = sign(q_z) \frac{1}{2} \sqrt{1-r_{11}-r_{22} + r_{33}} \\
+\end{aligned}
+\right.  \tag{13}
+\]</span></p>
+<h4 id="从四元数到旋转矩阵的转换">2.3.2 从四元数到旋转矩阵的转换</h4>
+<p><span class="math display">\[
+\boldsymbol{R}=\left(s^2-\boldsymbol{v}^{\mathrm{T}}
+\boldsymbol{v}\right) \boldsymbol{I}+2 \boldsymbol{v}
+\boldsymbol{v}^{\mathrm{T}}+2 s \boldsymbol{v}^{\wedge} \tag{14}
+\]</span></p>
+<h2 id="旋转更新">3. 旋转更新</h2>
+<ul>
+<li>在优化姿态时，通常计算一个旋转向量增量<span
+class="math inline">\(\delta
+\boldsymbol{\phi}\)</span>，再用它更新当前的估计值<span
+class="math inline">\(\mathbf{R} \leftarrow \mathbf{R} \exp
+\left(\boldsymbol{\delta
+\boldsymbol{\phi}}^{\wedge}\right)\)</span>或<span
+class="math inline">\(\mathbf{q} \leftarrow \mathbf{q} \otimes
+exp(\frac{\boldsymbol{\delta\phi}}{2})\)</span></li>
+</ul>
+<h2 id="参考文献">参考文献</h2>
+<ol type="1">
+<li>《视觉SLAM十四讲》</li>
+<li>Sola J. Quaternion kinematics for the error-state Kalman filter[J].
+arXiv preprint arXiv:1711.02508, 2017.</li>
+<li>《机器人学中的状态估计》</li>
+<li>《多旋翼飞行器设计与控制》</li>
+<li>深蓝学院《从零手写VIO》课程</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -166,7 +397,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/zcl-notes/2022/11/30/%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%E6%B1%82%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84/" class="post-title-link" itemprop="url">奇异值分解求解线性方程组</a>
+          <a href="/zcl-notes/2022/11/30/%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%E6%B1%82%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta-container">
@@ -176,9 +407,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2022-11-30 17:27:53 / 修改时间：17:31:03" itemprop="dateCreated datePublished" datetime="2022-11-30T17:27:53+08:00">2022-11-30</time>
+      <time title="创建时间：2022-11-30 17:26:52" itemprop="dateCreated datePublished" datetime="2022-11-30T17:26:52+08:00">2022-11-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-12-01 16:09:08" itemprop="dateModified" datetime="2022-12-01T16:09:08+08:00">2022-12-01</time>
     </span>
 
   
@@ -191,7 +428,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
+          <h1 id="奇异值分解求解线性方程组">奇异值分解求解线性方程组</h1>
+<blockquote>
 <p><strong>奇异值分解（SVD）</strong>：</p>
 <p>设<span class="math inline">\(\boldsymbol{A} \in \mathbb{C}^{m \times
 n}_r\)</span>，则存在正交矩阵<span class="math inline">\(\boldsymbol{U}
@@ -213,21 +451,23 @@ class="math inline">\(\boldsymbol{A}\)</span>的正奇异值</p>
 求解齐次线性方程组（<span
 class="math inline">\(\boldsymbol{A}\boldsymbol{x}=
 \boldsymbol{0}\)</span>）</h2>
-问题等价于<span class="math inline">\(min||
+问题等价于<span class="math inline">\(\min _{\boldsymbol{x}}||
 \boldsymbol{A}\boldsymbol{x}||^2\)</span>，则 $$
 <span class="math display">\[\begin{aligned}
-&amp; min|| \boldsymbol{A}\boldsymbol{x}||^2 \\
-= &amp; min || \boldsymbol{U}   \boldsymbol{D} \boldsymbol{V}^T
+&amp; \min _{\boldsymbol{x}}|| \boldsymbol{A}\boldsymbol{x}||^2 \\
+= &amp; \min _{\boldsymbol{x}} || \boldsymbol{U}   \boldsymbol{D}
+\boldsymbol{V}^T \boldsymbol{x}||^2 \\
+= &amp; \min _{\boldsymbol{x}} ||  \boldsymbol{D} \boldsymbol{V}^T
 \boldsymbol{x}||^2 \\
-= &amp; min ||  \boldsymbol{D} \boldsymbol{V}^T \boldsymbol{x}||^2 \\
 
 \end{aligned} \tag{1}\]</span>
 <p>$$ 令<span class="math inline">\(\boldsymbol{y} = \boldsymbol{V}^T
 \boldsymbol{x}\)</span>，则<span
-class="math inline">\((1)\)</span>式变为<span class="math inline">\(min
-|| \boldsymbol{D} \boldsymbol{y} ||^2 = min(\sigma_1^2y_1^2 +
-\sigma_2^2y_2^2 + ... + \sigma_r^2y_r^2)\)</span>，其中<span
-class="math inline">\(r &lt;= n\)</span></p>
+class="math inline">\((1)\)</span>式变为<span class="math inline">\(\min
+_{\boldsymbol{y}} || \boldsymbol{D} \boldsymbol{y} ||^2 = \min
+_{\boldsymbol{y}}\left(\sigma_1^2y_1^2 + \sigma_2^2y_2^2 + ... +
+\sigma_r^2y_r^2\right)\)</span>，其中<span class="math inline">\(r &lt;=
+n\)</span></p>
 <p>因为<span class="math inline">\(\sigma_1 &gt; \sigma_2 &gt; ... &gt;
 \sigma_r &gt; 0\)</span>，所有不管<span
 class="math inline">\(r\)</span>是否等于<span
@@ -244,24 +484,25 @@ class="math inline">\(\boldsymbol{V}\)</span>的最后一列</p>
 求解非齐次线性方程组（<span
 class="math inline">\(\boldsymbol{A}\boldsymbol{x}=
 \boldsymbol{b}\)</span>）</h2>
-<p>问题等价于<span class="math inline">\(min||
+<p>问题等价于<span class="math inline">\(\min _{\boldsymbol{x}} ||
 \boldsymbol{A}\boldsymbol{x}-\boldsymbol{b}||^2\)</span>，则 <span
 class="math display">\[
 \begin{aligned}
-&amp; min|| \boldsymbol{A}\boldsymbol{x}-\boldsymbol{b}||^2 \\
-= &amp; min || \boldsymbol{U}   \boldsymbol{D} \boldsymbol{V}^T
-\boldsymbol{x} -\boldsymbol{b} ||^2 \\
-= &amp; min ||  \boldsymbol{D} \boldsymbol{V}^T \boldsymbol{x}
--\boldsymbol{U}^T\boldsymbol{b} ||^2 \\
+&amp; \min _{\boldsymbol{x}}||
+\boldsymbol{A}\boldsymbol{x}-\boldsymbol{b}||^2 \\
+= &amp; \min _{\boldsymbol{x}} || \boldsymbol{U}   \boldsymbol{D}
+\boldsymbol{V}^T \boldsymbol{x} -\boldsymbol{b} ||^2 \\
+= &amp; \min _{\boldsymbol{x}} ||  \boldsymbol{D} \boldsymbol{V}^T
+\boldsymbol{x} -\boldsymbol{U}^T\boldsymbol{b} ||^2 \\
 \end{aligned} \tag{2}
 \]</span> 令<span class="math inline">\(\boldsymbol{y} =
 \boldsymbol{V}^T \boldsymbol{x}\)</span>，<span
 class="math inline">\(\boldsymbol{c} = \boldsymbol{U}^T
 \boldsymbol{b}\)</span>，则<span
-class="math inline">\((2)\)</span>式变为<span class="math inline">\(min
-|| \boldsymbol{D} \boldsymbol{y} - \boldsymbol{c}||^2 = min\left(
-\sum_{i=1}^r(\sigma_i y_i - c_i)^2+\sum_{i=r+1}^m c_i^2
-\right)\)</span></p>
+class="math inline">\((2)\)</span>式变为<span class="math inline">\(\min
+_{\boldsymbol{y}} || \boldsymbol{D} \boldsymbol{y} - \boldsymbol{c}||^2
+= \min _{\boldsymbol{y}}\left( \sum_{i=1}^r(\sigma_i y_i -
+c_i)^2+\sum_{i=r+1}^m c_i^2 \right)\)</span></p>
 <p>当<span class="math inline">\(y_i = \frac{c_i}{\sigma_i}(i =
 1,...,r)\)</span>而<span
 class="math inline">\(y_i(i=r+1,...,n)\)</span>为任意值时求得最优解</p>
@@ -595,7 +836,7 @@ target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

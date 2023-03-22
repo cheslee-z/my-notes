@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 5.4.2">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/zcl-notes/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zcl-notes/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zcl-notes/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zcl-notes/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zcl-notes/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"cheslee-z.github.io","root":"/zcl-notes/","images":"/zcl-notes/images","scheme":"Pisces","darkmode":true,"version":"8.13.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/zcl-notes/js/config.js"></script>
+
+    <meta name="description" content="本文内容均默认使用右手定则，且旋转向量在局部坐标系中表达（即右乘）  代码实现  1. 旋转表示 1.1 旋转向量  用\(\boldsymbol{\phi} &#x3D; \phi \boldsymbol{n}\)表示绕着单位轴\(\boldsymbol{n}\)旋转\(\phi\)弧度，用\(\boldsymbol{\omega}\)表示旋转角速率  1.2 旋转矩阵  旋转">
+<meta property="og:type" content="article">
+<meta property="og:title" content="旋转表示、转换及更新">
+<meta property="og:url" content="http://cheslee-z.github.io/zcl-notes/2023/03/23/%E6%97%8B%E8%BD%AC%E8%A1%A8%E7%A4%BA%E3%80%81%E8%BD%AC%E6%8D%A2%E5%8F%8A%E6%9B%B4%E6%96%B0/index.html">
+<meta property="og:site_name" content="Chenlong Zhang&#39;s Blog">
+<meta property="og:description" content="本文内容均默认使用右手定则，且旋转向量在局部坐标系中表达（即右乘）  代码实现  1. 旋转表示 1.1 旋转向量  用\(\boldsymbol{\phi} &#x3D; \phi \boldsymbol{n}\)表示绕着单位轴\(\boldsymbol{n}\)旋转\(\phi\)弧度，用\(\boldsymbol{\omega}\)表示旋转角速率  1.2 旋转矩阵  旋转">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-03-23T03:56:56.000Z">
+<meta property="article:modified_time" content="2023-03-22T03:56:52.586Z">
+<meta property="article:author" content="Chenlong Zhang">
+<meta property="article:tag" content="SLAM">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://cheslee-z.github.io/zcl-notes/2023/03/23/%E6%97%8B%E8%BD%AC%E8%A1%A8%E7%A4%BA%E3%80%81%E8%BD%AC%E6%8D%A2%E5%8F%8A%E6%9B%B4%E6%96%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://cheslee-z.github.io/zcl-notes/2023/03/23/%E6%97%8B%E8%BD%AC%E8%A1%A8%E7%A4%BA%E3%80%81%E8%BD%AC%E6%8D%A2%E5%8F%8A%E6%9B%B4%E6%96%B0/","path":"2023/03/23/旋转表示、转换及更新/","title":"旋转表示、转换及更新"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>旋转表示、转换及更新 | Chenlong Zhang's Blog</title>
+  
+
+
+
+
+
+
+  <script async defer data-website-id="" src=""></script>
+
+  <script defer data-domain="" src=""></script>
+
+  <noscript>
+    <link rel="stylesheet" href="/zcl-notes/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zcl-notes/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Chenlong Zhang's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">welcome!</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E8%A1%A8%E7%A4%BA"><span class="nav-number">1.</span> <span class="nav-text">1. 旋转表示</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E5%90%91%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 旋转向量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 旋转矩阵</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E5%85%83%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 四元数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.</span> <span class="nav-text">2. 旋转转换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E5%90%91%E9%87%8F%E4%B8%8E%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 旋转向量与旋转矩阵</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E6%97%8B%E8%BD%AC%E5%90%91%E9%87%8F%E8%BD%AC%E6%8D%A2%E5%88%B0%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1
+从旋转向量转换到旋转矩阵的转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5%E8%BD%AC%E6%8D%A2%E5%88%B0%E6%97%8B%E8%BD%AC%E5%90%91%E9%87%8F%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2
+从旋转矩阵转换到旋转向量的转换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E5%90%91%E9%87%8F%E4%B8%8E%E5%9B%9B%E5%85%83%E6%95%B0"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 旋转向量与四元数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E6%97%8B%E8%BD%AC%E5%90%91%E9%87%8F%E5%88%B0%E5%9B%9B%E5%85%83%E6%95%B0%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 从旋转向量到四元数的转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E5%9B%9B%E5%85%83%E6%95%B0%E5%88%B0%E6%97%8B%E8%BD%AC%E5%90%91%E9%87%8F%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 从四元数到旋转向量的转换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5%E4%B8%8E%E5%9B%9B%E5%85%83%E6%95%B0"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 旋转矩阵与四元数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5%E5%88%B0%E5%9B%9B%E5%85%83%E6%95%B0%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.3.1.</span> <span class="nav-text">2.3.1 从旋转矩阵到四元数的转换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8E%E5%9B%9B%E5%85%83%E6%95%B0%E5%88%B0%E6%97%8B%E8%BD%AC%E7%9F%A9%E9%98%B5%E7%9A%84%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.3.2 从四元数到旋转矩阵的转换</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC%E6%9B%B4%E6%96%B0"><span class="nav-number">3.</span> <span class="nav-text">3. 旋转更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="nav-number">4.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chenlong Zhang</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/zcl-notes/archives/">
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://cheslee-z.github.io/zcl-notes/2023/03/23/%E6%97%8B%E8%BD%AC%E8%A1%A8%E7%A4%BA%E3%80%81%E8%BD%AC%E6%8D%A2%E5%8F%8A%E6%9B%B4%E6%96%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zcl-notes/images/avatar.gif">
+      <meta itemprop="name" content="Chenlong Zhang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Chenlong Zhang's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="旋转表示、转换及更新 | Chenlong Zhang's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          旋转表示、转换及更新
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-03-23 11:56:56" itemprop="dateCreated datePublished" datetime="2023-03-23T11:56:56+08:00">2023-03-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-03-22 11:56:52" itemprop="dateModified" datetime="2023-03-22T11:56:52+08:00">2023-03-22</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <hr />
+<p>本文内容均默认使用右手定则，且旋转向量在局部坐标系中表达（即右乘）</p>
+<ul class="task-list">
+<li><input type="checkbox" disabled="" />代码实现</li>
+</ul>
+<h2 id="旋转表示">1. 旋转表示</h2>
+<h3 id="旋转向量">1.1 旋转向量</h3>
+<ul>
+<li>用<span class="math inline">\(\boldsymbol{\phi} = \phi
+\boldsymbol{n}\)</span>表示绕着单位轴<span
+class="math inline">\(\boldsymbol{n}\)</span>旋转<span
+class="math inline">\(\phi\)</span>弧度，用<span
+class="math inline">\(\boldsymbol{\omega}\)</span>表示旋转角速率</li>
+</ul>
+<h3 id="旋转矩阵">1.2 旋转矩阵</h3>
+<ul>
+<li><p>旋转行为： <span class="math display">\[
+  \boldsymbol{x}^{&#39;} = \boldsymbol{R}\boldsymbol{x} \tag{1}
+  \]</span></p></li>
+<li><p>约束： <span class="math display">\[
+  \boldsymbol{R}\boldsymbol{R}^\mathrm{T} =
+\boldsymbol{R}^\mathrm{T}\boldsymbol{R} = \boldsymbol{I}, \quad
+det(\boldsymbol{R}) = 1  \tag{2}
+  \]</span></p></li>
+<li><p>微分： <span class="math display">\[
+  \dot{\boldsymbol{R}}=\boldsymbol{R}\boldsymbol{\omega}^{\wedge}
+\tag{3}
+  \]</span></p></li>
+</ul>
+<h3 id="四元数">1.3 四元数</h3>
+<ul>
+<li><p>表示： <span class="math display">\[
+  \boldsymbol{q}=[s, \boldsymbol{v}]^{\mathrm{T}}, \quad s=q_w \in
+\mathbb{R}, \quad \boldsymbol{v}=\left[q_x, q_y, q_z\right]^{\mathrm{T}}
+\in \mathbb{R}^3 \tag{4}
+  \]</span></p>
+<blockquote>
+<p>只有单位四元数才能表示旋转</p>
+</blockquote></li>
+<li><p>四元数乘法： <span class="math display">\[
+  \mathbf{q}_a \otimes \mathbf{q}_b =\left[\begin{array}{c}
+  s_a s_b-\mathbf{v}_a^{\top} \mathbf{v}_b \\
+  s_a \mathbf{v}_b+s_b \mathbf{v}_a+\mathbf{v}_a \times \mathbf{v}_b
+  \end{array}\right] \tag{5}
+  \]</span></p>
+<blockquote>
+<p>!!!四元数乘法不满足乘法结合律</p>
+</blockquote></li>
+<li><p>旋转行为： <span class="math display">\[
+  \boldsymbol{x}^{&#39;} = \boldsymbol{q} \otimes \boldsymbol{x} \otimes
+\boldsymbol{q}^* \tag{6}
+  \]</span></p></li>
+<li><p>约束： <span class="math display">\[
+  \mathbf{q} \otimes \mathbf{q}^* = \mathbf{q}^* \otimes \mathbf{q}
+=1      \tag{7}
+  \]</span></p></li>
+<li><p>微分： <span class="math display">\[
+  \dot{\mathbf{q}}=\frac{1}{2} \mathbf{q} \otimes
+\boldsymbol{\omega}  \tag{8}
+  \]</span></p></li>
+</ul>
+<h2 id="旋转转换">2. 旋转转换</h2>
+<h3 id="旋转向量与旋转矩阵">2.1 旋转向量与旋转矩阵</h3>
+<h4 id="从旋转向量转换到旋转矩阵的转换">2.1.1
+从旋转向量转换到旋转矩阵的转换</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\boldsymbol{R} &amp;=\exp \left(\boldsymbol{\phi}^{\wedge}\right) =
+\sum_{n=0}^{\infty}
+\frac{1}{n!}\left(\boldsymbol{\phi}^{\wedge}\right)^n  \approx
+\boldsymbol{I}+\boldsymbol{\phi}^{\wedge} \\
+&amp;= \exp \left(\phi \boldsymbol{n}^{\wedge}\right) = \cos \phi
+\boldsymbol{I}+(1-\cos
+\phi)\boldsymbol{n}\boldsymbol{n}^{\mathrm{T}}+\sin \phi
+\boldsymbol{n}^{\wedge}
+\end{aligned}  \tag{9}
+\]</span></p>
+<blockquote>
+<p>式(9)的第二行即<strong>罗德里格斯公式</strong></p>
+</blockquote>
+<h4 id="从旋转矩阵转换到旋转向量的转换">2.1.2
+从旋转矩阵转换到旋转向量的转换</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\phi &amp; =\arccos \frac{\operatorname{tr}(\boldsymbol{R})-1}{2} \\
+\boldsymbol{n} &amp;
+=\frac{\left(\boldsymbol{R}-\boldsymbol{R}^{\top}\right)^{\vee}}{2 \sin
+\phi}
+\end{aligned}  \tag{10}
+\]</span></p>
+<h3 id="旋转向量与四元数">2.2 旋转向量与四元数</h3>
+<h4 id="从旋转向量到四元数的转换">2.2.1 从旋转向量到四元数的转换</h4>
+<p>将<span
+class="math inline">\(\boldsymbol{\phi}\)</span>转换为纯四元数（pure
+quaternion），则有 <span class="math display">\[
+\boldsymbol{q} = exp(\frac{\boldsymbol{\phi}}{2}) =
+\left[\begin{array}{c}
+\cos \frac{\phi}{2} \\
+\boldsymbol{n} \sin \frac{\phi}{2}
+\end{array}\right] \approx
+\left[\begin{array}{c}
+1 \\
+\frac{1}{2}\boldsymbol{\phi}
+\end{array}\right]
+\tag{11}
+\]</span></p>
+<blockquote>
+<p>上式中存在<span
+class="math inline">\(\boldsymbol{\phi}\)</span>到纯四元数（pure
+quaternion）的隐含转换</p>
+</blockquote>
+<h4 id="从四元数到旋转向量的转换">2.2.2 从四元数到旋转向量的转换</h4>
+<p><span class="math display">\[
+\begin{aligned}
+\phi &amp; =2 \arctan \left(||\boldsymbol{v}||, s \right) \\
+\boldsymbol{n} &amp; =\frac{\boldsymbol{v}}{ ||\boldsymbol{v}||}
+\end{aligned} \tag{12}
+\]</span></p>
+<h3 id="旋转矩阵与四元数">2.3 旋转矩阵与四元数</h3>
+<h4 id="从旋转矩阵到四元数的转换">2.3.1 从旋转矩阵到四元数的转换</h4>
+<p><span class="math display">\[
+\left\{
+\begin{aligned}
+q_w = sign(q_w) \frac{1}{2} \sqrt{1+r_{11}+r_{22} + r_{33}} \\
+q_x = sign(q_x) \frac{1}{2} \sqrt{1+r_{11}-r_{22} - r_{33}} \\
+q_y = sign(q_y) \frac{1}{2} \sqrt{1-r_{11}+r_{22} - r_{33}} \\
+q_z = sign(q_z) \frac{1}{2} \sqrt{1-r_{11}-r_{22} + r_{33}} \\
+\end{aligned}
+\right.  \tag{13}
+\]</span></p>
+<h4 id="从四元数到旋转矩阵的转换">2.3.2 从四元数到旋转矩阵的转换</h4>
+<p><span class="math display">\[
+\boldsymbol{R}=\left(s^2-\boldsymbol{v}^{\mathrm{T}}
+\boldsymbol{v}\right) \boldsymbol{I}+2 \boldsymbol{v}
+\boldsymbol{v}^{\mathrm{T}}+2 s \boldsymbol{v}^{\wedge} \tag{14}
+\]</span></p>
+<h2 id="旋转更新">3. 旋转更新</h2>
+<ul>
+<li>在优化姿态时，通常计算一个旋转向量增量<span
+class="math inline">\(\delta
+\boldsymbol{\phi}\)</span>，再用它更新当前的估计值<span
+class="math inline">\(\mathbf{R} \leftarrow \mathbf{R} \exp
+\left(\boldsymbol{\delta
+\boldsymbol{\phi}}^{\wedge}\right)\)</span>或<span
+class="math inline">\(\mathbf{q} \leftarrow \mathbf{q} \otimes
+exp(\frac{\boldsymbol{\delta\phi}}{2})\)</span></li>
+</ul>
+<h2 id="参考文献">参考文献</h2>
+<ol type="1">
+<li>《视觉SLAM十四讲》</li>
+<li>Sola J. Quaternion kinematics for the error-state Kalman filter[J].
+arXiv preprint arXiv:1711.02508, 2017.</li>
+<li>《机器人学中的状态估计》</li>
+<li>《多旋翼飞行器设计与控制》</li>
+<li>深蓝学院《从零手写VIO》课程</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zcl-notes/tags/SLAM/" rel="tag"># SLAM</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/zcl-notes/2022/11/30/%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3%E6%B1%82%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84/" rel="prev" title="">
+                  <i class="fa fa-chevron-left"></i> 
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chenlong Zhang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/cheslee-z" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/zcl-notes/js/comments.js"></script><script src="/zcl-notes/js/utils.js"></script><script src="/zcl-notes/js/motion.js"></script><script src="/zcl-notes/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/zcl-notes/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
